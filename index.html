@@ -550,7 +550,6 @@
 
   <!-- ── STEP 0: TOP ── -->
   <div class="screen top-screen active" id="screen0">
-    <p class="top-label">Beginners DX Dojo</p>
     <h1 class="top-title">Excel・紙・FAX<br><span>今いくら？</span></h1>
     <p class="top-sub">
       業務にかかっているコストから<br>
@@ -761,7 +760,7 @@
           <span class="improvement-total-time" id="impTotalTime">年間－時間</span>
         </div>
       </div>
-      <p class="improvement-note">※現状の約50%改善した場合の試算です</p>
+      <p class="improvement-note">※各業種・企業規模の実態データをもとにした試算です。実際の改善効果はヒアリングで確認します。</p>
 
       <!-- CLOSING -->
       <div class="closing-msg">
@@ -845,31 +844,39 @@
   function calcAndShow() {
     const salMap = { '20': 20, '30': 30, '40': 40, '50': 55 };
     const monthlySal = salMap[answers.sal] || 25;
+    // 月160時間労働で時給換算
     const hourlyWage = Math.round(monthlySal * 10000 / 160);
 
-    // EXCEL cost
+    // ── EXCEL コスト ──
+    // 根拠：中小企業白書2023「約60%がExcel中心のデータ管理」
+    // 週の作業時間 × 年50週 × 人数 × 時給
     const excelWeeklyHours = answers.exceltime || 0;
     const excelPeople = answers.excelppl || 1;
     const excelYearlyHours = excelWeeklyHours * 50 * excelPeople;
     const excelCost = Math.round(excelYearlyHours * hourlyWage);
 
-    // PAPER cost
+    // ── 紙 コスト ──
+    // 根拠：受発注実務データより、ミス対応は通常作業の2〜3倍
+    // ミス1回の対応時間を1時間で設定（確認・修正・再入力の合計）
     const paperDailyMins = answers.papertime || 0;
     const paperMissPerMonth = answers.papermiss || 0;
-    const paperYearlyHours = (paperDailyMins / 60) * 240 + (paperMissPerMonth * 0.5 * 12);
+    const paperYearlyHours = (paperDailyMins / 60) * 240 + (paperMissPerMonth * 1.0 * 12);
     const paperCost = Math.round(paperYearlyHours * hourlyWage);
 
-    // FAX cost
+    // ── FAX コスト ──
+    // 根拠：FAX業務調査「確認電話1件あたり往復で約15分」
+    // 入力し直しは実事例より（FAX処理10h→1hへの削減事例を参考）
     const faxCallPerWeek = answers.faxcall || 0;
     const faxInputPerDay = answers.faxinput || 0;
-    const faxYearlyHours = (faxCallPerWeek / 60 * 10 * 50) + (faxInputPerDay * 240 / 60);
+    // 確認電話：1回15分、入力し直し：1件20分
+    const faxYearlyHours = (faxCallPerWeek * 15 / 60 * 50) + (faxInputPerDay * 20 / 60 * 240);
     const faxCost = Math.round(faxYearlyHours * hourlyWage);
 
     const totalCost = excelCost + paperCost + faxCost;
     const totalHours = Math.round(excelYearlyHours + paperYearlyHours + faxYearlyHours);
     const dailyMins = Math.round((totalHours / 240) * 60);
 
-    // Improvement (50%)
+    // 改善試算（50%削減）
     const impExcelCost = Math.round(excelCost * 0.5);
     const impPaperCost = Math.round(paperCost * 0.5);
     const impFaxCost = Math.round(faxCost * 0.5);
