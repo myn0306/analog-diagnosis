@@ -768,7 +768,7 @@
       </div>
 
       <button class="pdf-btn no-print" onclick="window.print()">結果をPDFで保存する</button>
-   <div style="
+ <div class="no-print" style="
   background: #f0faf8;
   border: 1px solid #c8e6c9;
   border-radius: 12px;
@@ -955,6 +955,7 @@
         },
         options: {
           responsive: true,
+          
           maintainAspectRatio: false,
           plugins: {
             legend: { display: false },
